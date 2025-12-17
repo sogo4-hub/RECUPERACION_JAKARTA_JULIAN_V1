@@ -1,9 +1,8 @@
 package es.daw.jakarta.pedidosexamen.repository;
 
-import es.daw.jakarta.pedidosexamen.model.Cliente;
+import es.daw.jakarta.pedidosexamen.dao.GenericDAO;
 import es.daw.jakarta.pedidosexamen.model.Pedido;
 
-import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class PedidoDAO implements GenericDAO<Pedido, Long>{
+public class PedidoDAO implements GenericDAO<Pedido, Long> {
 
     private Connection conn;
 
@@ -60,5 +59,28 @@ public class PedidoDAO implements GenericDAO<Pedido, Long>{
     @Override
     public void delete(Long id) throws SQLException {
 
+    }
+    // Nuevo método para filtrar por cliente
+    public List<Pedido> findByClienteId(Long clienteId) throws SQLException {
+        List<Pedido> pedidos = new ArrayList<>();
+        // Consultamos solo los pedidos que coincidan con el cliente_id
+        String sql = "SELECT * FROM pedido WHERE cliente_id = ?";
+
+        try(PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setLong(1, clienteId); // Pasamos el ID al filtro SQL
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                pedidos.add(
+                        new Pedido(
+                                rs.getLong("cliente_id"),
+                                rs.getTimestamp("fecha_pedido").toLocalDateTime(),
+                                rs.getBigDecimal("total"),
+                                Pedido.EstadoPedido.valueOf(rs.getString("estado"))
+                        )
+                );
+            }
+        }
+        return pedidos;
     }
 }

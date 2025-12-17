@@ -2,8 +2,7 @@ package es.daw.jakarta.pedidosexamen.controller;
 
 import es.daw.jakarta.pedidosexamen.model.Cliente;
 import es.daw.jakarta.pedidosexamen.repository.ClienteDAO;
-import es.daw.jakarta.pedidosexamen.repository.GenericDAO;
-import es.daw.jakarta.pedidosexamen.repository.PedidoDAO;
+import es.daw.jakarta.pedidosexamen.dao.GenericDAO;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

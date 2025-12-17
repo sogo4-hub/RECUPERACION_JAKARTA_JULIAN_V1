@@ -2,6 +2,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="es.daw.jakarta.pedidosexamen.model.Pedido" %>
 <%@ page import="es.daw.jakarta.pedidosexamen.model.Cliente" %>
+<%@ page import="java.util.Map" %>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -67,7 +68,12 @@
                         if (clientes != null) {
                             for (Cliente c : clientes) {
                     %>
-                    <option value="<%= c.getId() %>">
+                    <%
+                        // Recuperamos el ID que envió el Servlet (puede ser null)
+                        Long seleccionado = (Long) request.getAttribute("clienteIdSeleccionado");
+                        boolean isSelected = (seleccionado != null) && seleccionado.equals(c.getId());
+                    %>
+                    <option value="<%= c.getId() %>" <%= isSelected ? "selected" : "" %>>
                         <%= c.getNombre() %> (<%= c.getNif() %>)
                     </option>
                     <%
@@ -90,6 +96,7 @@
         <h4 class="mb-4 text-primary">📋 Lista de Pedidos</h4>
         <%
             List<Pedido> pedidos = (List<Pedido>) request.getAttribute("pedidos");
+            Map<Long, String> mapaClientes = (Map<Long, String>) request.getAttribute("mapaClientes");
             if (pedidos == null || pedidos.isEmpty()) {
         %>
         <div class="alert alert-warning text-center">No se encontraron pedidos para los criterios seleccionados.</div>
@@ -105,11 +112,18 @@
                     <th>Total (€)</th>
                     <th>
                         Estado
-                        <!-- Enlaces para ordenar -->
-                        <a href="" class="sort-link" title="Orden ascendente">
+                        <%
+                            String clienteIdParam = request.getParameter("clienteId");
+                            String baseLink = request.getContextPath() + "/pedidos/listar?";
+                            if (clienteIdParam != null && !clienteIdParam.isEmpty()) {
+                                baseLink += "clienteId=" + clienteIdParam + "&";
+                            }
+                        %>
+
+                        <a href="<%= baseLink %>orden=asc" class="sort-link text-primary text-decoration-none" title="Orden ascendente">
                             ▲
                         </a>
-                        <a href="" class="sort-link" title="Orden descendente">
+                        <a href="<%= baseLink %>orden=desc" class="sort-link text-primary text-decoration-none" title="Orden descendente">
                             ▼
                         </a>
                     </th>
@@ -120,17 +134,25 @@
                     for (Pedido p : pedidos) {
                 %>
                 <tr>
-                    <td><%= p.getId_cliente() %></td>
+                    <td>
+                        <%= (mapaClientes != null && mapaClientes.containsKey(p.getId_cliente()))
+                                ? mapaClientes.get(p.getId_cliente())
+                                : "ID: " + p.getId_cliente() %>
+                    </td>
                     <td><%= p.getFechaPedido() %></td>
                     <td><%= String.format("%.2f", p.getTotal()) %></td>
                     <td>
-                        <% String estado = p.getEstado().name();
-                            String badgeClass = switch (estado) {
-                                case "ENTREGADO" -> "bg-success";
-                                case "PENDIENTE" -> "bg-warning text-dark";
-                                case "CANCELADO" -> "bg-danger";
-                                default -> "bg-secondary";
-                            };
+                        <%
+                            String estado = p.getEstado().name();
+                            String badgeClass = "bg-secondary"; // Valor por defecto
+
+                            if ("ENTREGADO".equals(estado)) {
+                                badgeClass = "bg-success";
+                            } else if ("PENDIENTE".equals(estado)) {
+                                badgeClass = "bg-warning text-dark";
+                            } else if ("CANCELADO".equals(estado)) {
+                                badgeClass = "bg-danger";
+                            }
                         %>
                         <span class="badge <%= badgeClass %> status-badge"><%= estado %></span>
                     </td>

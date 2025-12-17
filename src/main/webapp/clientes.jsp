@@ -81,8 +81,9 @@
                         <h5 class="card-title text-success fw-bold"><%= c.getNombre() %></h5>
 
                         <!-- Ícono de eliminación -->
-                        <form action="clientes/eliminar" method="post"
+                        <form action="<%= request.getContextPath() %>/clientes/eliminar" method="post"
                               onsubmit="return confirm('¿Seguro que deseas eliminar este cliente?');">
+                            <input type="hidden" name="id" value="<%= c.getId() %>">
                             <button type="submit" class="btn btn-link p-0" title="Eliminar cliente">
                                 <i class="bi bi-trash-fill icon-delete fs-5"></i>
                             </button>

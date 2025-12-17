@@ -1,9 +1,8 @@
 package es.daw.jakarta.pedidosexamen.repository;
 
+import es.daw.jakarta.pedidosexamen.dao.GenericDAO;
 import es.daw.jakarta.pedidosexamen.model.Cliente;
-import es.daw.jakarta.pedidosexamen.model.Pedido;
 
-import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ClienteDAO implements GenericDAO<Cliente, Long>{
+public class ClienteDAO implements GenericDAO<Cliente, Long> {
     private Connection conn;
 
     public ClienteDAO() throws SQLException {
@@ -58,6 +57,13 @@ public class ClienteDAO implements GenericDAO<Cliente, Long>{
 
     @Override
     public void delete(Long id) throws SQLException {
+        String sql = "DELETE FROM cliente WHERE id = ?";
 
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            ps.executeUpdate();
+        }
+        // IMPORTANTE: No capturamos la excepción aquí.
+        // Dejamos que "suba" para que el Servlet se entere si falla.
     }
 }

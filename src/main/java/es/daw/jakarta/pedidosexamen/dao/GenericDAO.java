@@ -1,4 +1,4 @@
-package es.daw.jakarta.pedidosexamen.repository;
+package es.daw.jakarta.pedidosexamen.dao;
 
 import java.sql.SQLException;
 import java.util.List;

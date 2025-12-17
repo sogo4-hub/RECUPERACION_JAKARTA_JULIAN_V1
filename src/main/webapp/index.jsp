@@ -82,12 +82,25 @@
                 <form action="preferencias" method="post" class="text-center">
                     <div class="mb-3">
                         <label for="pageSize" class="form-label fw-bold">Pedidos por página:</label>
+                        <%
+                            // Leemos la cookie para saber qué opción marcar como selected
+                            String cookieValue = "0"; // Valor por defecto
+                            Cookie[] cookies = request.getCookies();
+                            if (cookies != null) {
+                                for (Cookie c : cookies) {
+                                    if ("pageSize".equals(c.getName())) {
+                                        cookieValue = c.getValue();
+                                        break;
+                                    }
+                                }
+                            }
+                        %>
                         <select name="pageSize" id="pageSize" class="form-select d-inline-block">
-                            <option value="0">--- sin límite ---</option>
-                            <option value="3">3</option>
-                            <option value="5">5</option>
-                            <option value="8">8</option>
-                            <option value="10">10</option>
+                            <option value="0" <%= "0".equals(cookieValue) ? "selected" : "" %>>--- sin límite ---</option>
+                            <option value="3" <%= "3".equals(cookieValue) ? "selected" : "" %>>3</option>
+                            <option value="5" <%= "5".equals(cookieValue) ? "selected" : "" %>>5</option>
+                            <option value="8" <%= "8".equals(cookieValue) ? "selected" : "" %>>8</option>
+                            <option value="10" <%= "10".equals(cookieValue) ? "selected" : "" %>>10</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-outline-primary">Guardar</button>
